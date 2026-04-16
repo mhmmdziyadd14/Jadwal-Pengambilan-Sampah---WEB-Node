@@ -1,0 +1,19 @@
+[Unit]
+Description=Sampah Scheduler Backend Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/sampah-scheduler/backend
+ExecStart=/usr/bin/node /home/ubuntu/sampah-scheduler/backend/server.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/sampah-backend.log
+StandardError=append:/var/log/sampah-backend.log
+
+# Environment variables dari .env
+EnvironmentFile=/home/ubuntu/sampah-scheduler/backend/.env
+
+[Install]
+WantedBy=multi-user.target

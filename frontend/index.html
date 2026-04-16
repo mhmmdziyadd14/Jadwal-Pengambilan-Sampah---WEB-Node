@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Jadwal Pengangkutan Sampah</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Sistem Manajemen Sampah</h1>
+                <p>Kelola jadwal pengangkutan sampah dengan mudah</p>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="rumah">
+                Data Rumah
+            </button>
+            <button class="tab-btn" data-tab="petugas">
+                 Data Petugas
+            </button>
+            <button class="tab-btn" data-tab="jadwal">
+                 Jadwal Pengambilan
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- ===== TAB RUMAH ===== -->
+            <section id="rumah" class="tab-content active">
+                <div class="section-header">
+                    <h2>📍 Daftar Rumah</h2>
+                    <button class="btn btn-primary" onclick="openRumahModal()">+ Tambah Rumah</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Foto</th>
+                                <th>Nama Pemilik</th>
+                                <th>Alamat</th>
+                                <th>Telepon</th>
+                                <th>Zona</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rumahTable">
+                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===== TAB PETUGAS ===== -->
+            <section id="petugas" class="tab-content">
+                <div class="section-header">
+                    <h2>👷 Daftar Petugas Kebersihan</h2>
+                    <button class="btn btn-primary" onclick="openPetugasModal()">+ Tambah Petugas</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Foto</th>
+                                <th>Nama Petugas</th>
+                                <th>Telepon</th>
+                                <th>Zona Wilayah</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="petugasTable">
+                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ===== TAB JADWAL ===== -->
+            <section id="jadwal" class="tab-content">
+                <div class="section-header">
+                    <h2>📅 Jadwal Pengambilan Sampah</h2>
+                    <button class="btn btn-primary" onclick="openJadwalModal()">+ Tambah Jadwal</button>
+                </div>
+
+                <!-- Filter Bulan -->
+                <div class="filter-section">
+                    <label for="filterBulan">Filter Bulan:</label>
+                    <input type="month" id="filterBulan" onchange="loadJadwalByMonth()">
+                </div>
+
+                <!-- Calendar View -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button onclick="previousMonth()">&lt;</button>
+                        <h3 id="currentMonth"></h3>
+                        <button onclick="nextMonth()">&gt;</button>
+                    </div>
+                    <div id="calendar" class="calendar-grid"></div>
+                </div>
+
+                <!-- Jadwal List -->
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Rumah</th>
+                                <th>Alamat</th>
+                                <th>Petugas</th>
+                                <th>Keterangan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jadwalTable">
+                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ===== MODAL RUMAH ===== -->
+    <div id="rumahModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="rumahModalTitle">Tambah Rumah</h2>
+                <span class="close" onclick="closeRumahModal()">&times;</span>
+            </div>
+            <form id="rumahForm" onsubmit="saveRumah(event)" enctype="multipart/form-data">
+                <input type="hidden" id="rumahId">
+                <input type="hidden" id="rumahFotoUrl">
+                <div class="form-group">
+                    <label for="namaPemilik">Nama Pemilik:</label>
+                    <input type="text" id="namaPemilik" required>
+                </div>
+                <div class="form-group">
+                    <label for="alamat">Alamat:</label>
+                    <textarea id="alamat" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="nomorTelepon">Nomor Telepon:</label>
+                    <input type="tel" id="nomorTelepon" required>
+                </div>
+                <div class="form-group">
+                    <label for="zona">Zona Pengambilan:</label>
+                    <select id="zona" required>
+                        <option value="">-- Pilih Zona --</option>
+                        <option value="Zona A">Zona A</option>
+                        <option value="Zona B">Zona B</option>
+                        <option value="Zona C">Zona C</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="rumahFoto">📸 Upload Foto Rumah:</label>
+                    <input type="file" id="rumahFoto" accept="image/*">
+                    <small>Format: JPEG, PNG, GIF, WebP (Maks 5MB)</small>
+                    <div id="rumahFotoPreview" style="margin-top: 10px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRumahModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL PETUGAS ===== -->
+    <div id="petugasModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="petugasModalTitle">Tambah Petugas</h2>
+                <span class="close" onclick="closePetugasModal()">&times;</span>
+            </div>
+            <form id="petugasForm" onsubmit="savePetugas(event)" enctype="multipart/form-data">
+                <input type="hidden" id="petugasId">
+                <input type="hidden" id="petugasFotoUrl">
+                <div class="form-group">
+                    <label for="namaPetugas">Nama Petugas:</label>
+                    <input type="text" id="namaPetugas" required>
+                </div>
+                <div class="form-group">
+                    <label for="noTeleponPetugas">Nomor Telepon:</label>
+                    <input type="tel" id="noTeleponPetugas" required>
+                </div>
+                <div class="form-group">
+                    <label for="zonaWilayah">Zona Wilayah:</label>
+                    <select id="zonaWilayah" required>
+                        <option value="">-- Pilih Zona --</option>
+                        <option value="Zona A">Zona A</option>
+                        <option value="Zona B">Zona B</option>
+                        <option value="Zona C">Zona C</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select id="status" required>
+                        <option value="aktif">Aktif</option>
+                        <option value="nonaktif">Nonaktif</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="petugasFoto">Upload Foto Petugas:</label>
+                    <input type="file" id="petugasFoto" accept="image/*">
+                    <small>Format: JPEG, PNG, GIF, WebP (Maks 5MB)</small>
+                    <div id="petugasFotoPreview" style="margin-top: 10px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closePetugasModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== MODAL JADWAL ===== -->
+    <div id="jadwalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="jadwalModalTitle">Tambah Jadwal</h2>
+                <span class="close" onclick="closeJadwalModal()">&times;</span>
+            </div>
+            <form id="jadwalForm" onsubmit="saveJadwal(event)">
+                <input type="hidden" id="jadwalId">
+                <div class="form-group">
+                    <label for="idRumah">Pilih Rumah:</label>
+                    <select id="idRumah" required onchange="loadRumahDetails()"></select>
+                </div>
+                <div class="form-group">
+                    <label for="idPetugas">Pilih Petugas:</label>
+                    <select id="idPetugas" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="tanggalPengambilan">Tanggal Pengambilan:</label>
+                    <input type="date" id="tanggalPengambilan" required>
+                </div>
+                <div class="form-group">
+                    <label for="keterangan">Keterangan:</label>
+                    <textarea id="keterangan"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeJadwalModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Konfirmasi Hapus</h2>
+            </div>
+            <p id="confirmMessage"></p>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cancelDelete()">Batal</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
